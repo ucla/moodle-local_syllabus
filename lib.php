@@ -144,6 +144,36 @@ function local_ucla_syllabus_get_extra_capabilities() {
     return array();
 }
 
+/**
+ * Add syllabus tool to the navigation block.
+ * 
+ * @param $navigation The global navigation context
+ */
+function local_ucla_syllabus_extends_navigation(global_navigation $navigation) {
+    global $CFG, $PAGE;
+
+    // If we aren't viewing a course page, then return.
+    if (!$PAGE->course || $PAGE->course->id == 1) {
+        return;
+    }
+
+    // Get the name of the syllabus plugin, the id of the current course, and
+    // the link to the corresponding syllabus page.
+    $pluginname = get_string('pluginname', 'local_ucla_syllabus');
+    $courseid = $PAGE->course->id;
+    $pluginurl = $CFG->wwwroot . '/local/ucla_syllabus/index.php?id=' . $courseid;
+
+    // Find course node in navigation block, and create node for the course
+    // syllabus link.
+    $coursenode = $navigation->find($courseid, navigation_node::TYPE_COURSE);
+    $syllabusnode = navigation_node::create($pluginname, $pluginurl);
+
+    // Find the first node in the course's navigation, and add the syllabus
+    // node above it.
+    $childkeys = $coursenode->get_children_key_list();
+    $topchild = array_shift($childkeys);
+    $coursenode->add_node($syllabusnode, $topchild);
+}
 
 // File API.
 
