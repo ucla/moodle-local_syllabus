@@ -667,3 +667,74 @@ class ucla_public_syllabus extends ucla_syllabus {
         return $retval;
     }
 }
+
+/**
+ * Sets the editing button in the $PAGE element to be the url passed in.
+ * 
+ * Code copied from fragments of code in course/view.php to set the "Turn 
+ * editing on/off" button.
+ * 
+ * @global object $OUTPUT
+ * @global object $PAGE
+ * @global object $USER
+ * 
+ * @param moodle_url $url   Expecting moodle_url object. If null, then defaults
+ *                          redirecting user to $PAGE->url
+ */
+function set_editing_mode_button($url=null) {
+    global $OUTPUT, $PAGE, $USER;
+
+    if (empty($url)) {
+        $url = $PAGE->url;
+    }
+
+    // See if user is trying to turn editing on/off.
+    $edit = optional_param('edit', -1, PARAM_BOOL);
+    if (!isset($USER->editing)) {
+        $USER->editing = 0;
+    }  
+    if ($PAGE->user_allowed_editing()) {
+        if (($edit == 1) and confirm_sesskey()) {
+            $USER->editing = 1;
+            // Edited to use url specified in function.
+            redirect($url);
+        } else if (($edit == 0) and confirm_sesskey()) {
+            $USER->editing = 0;
+            if(!empty($USER->activitycopy) && $USER->activitycopycourse == $course->id) {
+                $USER->activitycopy       = false;
+                $USER->activitycopycourse = NULL;
+            }
+            // Edited to use url specified in function.
+            redirect($url);
+        }
+        // Edited to use url specified in function.
+        $buttons = $OUTPUT->edit_button($url);
+        $PAGE->set_button($buttons);
+    } else {
+        $USER->editing = 0;
+    }
+}
+
+/**
+ * Displays flash successful messages from session.
+ */
+function flash_display() {
+    global $OUTPUT;
+    if (isset($_SESSION['flash_success_msg'])) {
+        echo $OUTPUT->notification($_SESSION['flash_success_msg'], 'notifysuccess');
+        unset($_SESSION['flash_success_msg']);
+    }
+}
+
+/**
+ * Copies the $success_msg in a session variable to be used on redirected page
+ * via flash_display()
+ *
+ * @param moodle_url|string $url A moodle_url to redirect to. Strings are not to be trusted!
+ * @param string $success_msg The message to display to the user
+ */
+function flash_redirect($url, $success_msg) {
+    // Message to indicate to user that content was edited.
+    $_SESSION['flash_success_msg']  = $success_msg;
+    redirect($url);
+}

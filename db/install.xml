@@ -23,4 +23,5 @@
         <INDEX NAME="unique-syllabus-type" UNIQUE="true" FIELDS="courseid, access_type" COMMENT="Real uniqueness is courseid to access_type (1 or 2) and 3. Need to enforce that in code."/>
       </INDEXES>
     </TABLE>
+  </TABLES>
 </XMLDB>

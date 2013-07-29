@@ -29,7 +29,6 @@
 require_once(dirname(dirname(dirname(__FILE__))).'/config.php');
 require_once(dirname(__FILE__).'/locallib.php');
 require_once(dirname(__FILE__).'/syllabus_form.php');
-require_once($CFG->dirroot . '/local/ucla/lib.php');
 require_once($CFG->libdir . '/resourcelib.php');
 
 // Get script variables to be used later.
