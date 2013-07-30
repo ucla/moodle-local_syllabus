@@ -310,6 +310,7 @@ class syllabus_form extends moodleform {
      */
     private function display_private_syllabus_form($existingsyllabus) {
         $mform = $this->_form;
+        $config = $this->syllabusmanager->get_filemanager_config();
 
         // Add a syllabus description.
         $mform->addElement('static', 'syllabus_upload_desc', get_string('syllabus_url_file', 'local_ucla_syllabus').
@@ -367,6 +368,7 @@ class syllabus_form extends moodleform {
      */
     private function display_public_syllabus_form($existingsyllabus) {
         $mform = $this->_form;
+        $config = $this->syllabusmanager->get_filemanager_config();
 
         // Add syllabus description.
         $mform->addElement('static', 'syllabus_upload_desc', get_string('syllabus_url_file', 'local_ucla_syllabus'),
