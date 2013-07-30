@@ -114,23 +114,6 @@ if (!empty($USER->editing) && $canmanagesyllabus) {
         if (empty($todel)) {
             print_error('err_syllabus_notexist', 'local_ucla_syllabus');
         } else {
-            // CCLE-3685 - If the syllabus is the landing page and it is deleted
-            // then default the landing page back to the "Site info" page.
-            // Only revert the landing page if only one syllabus exists and is
-            // being deleted.
-            if (is_null($syllabi[UCLA_SYLLABUS_TYPE_PUBLIC]) ||
-                    is_null($syllabi[UCLA_SYLLABUS_TYPE_PRIVATE])
-                    ) {
-                require_once($CFG->dirroot.'/course/format/ucla/ucla_course_prefs.class.php');
-                require_once($CFG->dirroot.'/course/format/ucla/lib.php');
-
-                $courseprefs = new ucla_course_prefs($course->id);
-                if ($courseprefs->get_preference('landing_page') == UCLA_FORMAT_DISPLAY_SYLLABUS) {
-                    $courseprefs->set_preference('landing_page', 0);
-                    $courseprefs->commit();
-                }
-            }
-
             $syllabusmanager->delete_syllabus($todel);
 
             $url = new moodle_url('/local/ucla_syllabus/index.php',
