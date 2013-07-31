@@ -29,7 +29,7 @@
  */
 
 defined('MOODLE_INTERNAL') || die();
-
+require_once(dirname(__FILE__).'/locallib.php');
 
 // Moodle core API.
 
@@ -154,23 +154,29 @@ function local_ucla_syllabus_get_extra_capabilities() {
  * @param global_navigation $navigation The global navigation context
  */
 function local_ucla_syllabus_extends_navigation(global_navigation $navigation) {
-    global $CFG, $PAGE;
+    global $PAGE;
+
+    // Get course information.
+    $course = $PAGE->course;
 
     // If we aren't viewing a course page, then return.
-    if (!$PAGE->course || $PAGE->course->id == 1) {
+    if (!$course || $course->id == 1) {
         return;
     }
 
-    // Get the name of the syllabus plugin, the id of the current course, and
-    // the link to the corresponding syllabus page.
-    $pluginname = get_string('pluginname', 'local_ucla_syllabus');
-    $courseid = $PAGE->course->id;
-    $pluginurl = $CFG->wwwroot . '/local/ucla_syllabus/index.php?id=' . $courseid;
+    // Create syllabus manager for the course. Get the appropriate navigation
+    // node from the manager.
+    $syllabusmanager = new syllabus_manager($course);
+    $syllabusnode = $syllabusmanager->get_navigation_nodes();
 
-    // Find course node in navigation block, and create node for the course
-    // syllabus link.
-    $coursenode = $navigation->find($courseid, navigation_node::TYPE_COURSE);
-    $syllabusnode = navigation_node::create($pluginname, $pluginurl);
+    // If no navigation node is returned, then we shouldn't display a syllabus
+    // node.
+    if (!$syllabusnode) {
+        return;
+    }
+
+    // Find the course node in navigation block.
+    $coursenode = $navigation->find($course->id, navigation_node::TYPE_COURSE);
 
     // Find the first node in the course's navigation, and add the syllabus
     // node above it.

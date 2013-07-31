@@ -77,23 +77,6 @@ class syllabus_manager {
     }
 
     /**
-     * Returns if given course can host syllabus files. Currently, only SRS 
-     * based courses can have syllabus files.
-     * CCLE-3792: Instructional collab sites can host syllabus files 
-     * (along with SRS based courses).
-     *
-     * @return bool
-     */
-    public function can_host_syllabi() {
-        global $CFG;
-        require_once($CFG->dirroot . '/admin/tool/uclasiteindicator/lib.php');
-
-        $site = siteindicator_site::load($this->courseid);
-        return !is_collab_site($this->courseid) || (!is_null($site) &&
-            $site->property->type == siteindicator_manager::SITE_TYPE_INSTRUCTION);
-    }
-
-    /**
      * Returns if logged in user has the ability to manage syllabi for course.
      * 
      * @return bool
@@ -213,11 +196,6 @@ class syllabus_manager {
         $nodename = null;
         $retval = null;
 
-        // Restrict syllabus tool to only SRS sites.
-        if (!$this->can_host_syllabi()) {
-            return $retval;
-        }
-
         // Is there a syllabus uploaded?
         $syllabi = $this->get_syllabi();
 
@@ -234,7 +212,6 @@ class syllabus_manager {
             // syllabus when in editing mode.
             $nodename = get_string('syllabus_needs_setup', 'local_ucla_syllabus');
         }
-
         if (!empty($nodename)) {
             $url = new moodle_url('/local/ucla_syllabus/index.php',
                     array('id' => $this->courseid));
