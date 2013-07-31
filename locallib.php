@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Internal library of functions for UCLA syllabus.
+ * Internal library of functions for syllabus.
  *
  * All the core Moodle functions, neeeded to allow the module to work
  * integrated in Moodle should be placed here.
@@ -31,18 +31,18 @@
 defined('MOODLE_INTERNAL') || die();
 
 // Constants for syllabus management.
-define('UCLA_SYLLABUS_ACCESS_TYPE_PUBLIC', 1);
-define('UCLA_SYLLABUS_ACCESS_TYPE_LOGGEDIN', 2);
-define('UCLA_SYLLABUS_ACCESS_TYPE_PRIVATE', 3);
+define('SYLLABUS_ACCESS_TYPE_PUBLIC', 1);
+define('SYLLABUS_ACCESS_TYPE_LOGGEDIN', 2);
+define('SYLLABUS_ACCESS_TYPE_PRIVATE', 3);
 
-define('UCLA_SYLLABUS_TYPE_PUBLIC', 'public');
-define('UCLA_SYLLABUS_TYPE_PRIVATE', 'private');
+define('SYLLABUS_TYPE_PUBLIC', 'public');
+define('SYLLABUS_TYPE_PRIVATE', 'private');
 
-define('UCLA_SYLLABUS_ACTION_ADD', 'add');
-define('UCLA_SYLLABUS_ACTION_DELETE', 'delete');
-define('UCLA_SYLLABUS_ACTION_EDIT', 'edit');
-define('UCLA_SYLLABUS_ACTION_VIEW', 'view');
-define('UCLA_SYLLABUS_ACTION_CONVERT', 'convert');
+define('SYLLABUS_ACTION_ADD', 'add');
+define('SYLLABUS_ACTION_DELETE', 'delete');
+define('SYLLABUS_ACTION_EDIT', 'edit');
+define('SYLLABUS_ACTION_VIEW', 'view');
+define('SYLLABUS_ACTION_CONVERT', 'convert');
 
 /**
  * Syllabus manager class.
@@ -53,7 +53,7 @@ define('UCLA_SYLLABUS_ACTION_CONVERT', 'convert');
  * @copyright   2012 UC Regents
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class ucla_syllabus_manager {
+class syllabus_manager {
     /** @var int The ID of the course for the syllabus. */
     private $courseid;
 
@@ -107,15 +107,15 @@ class ucla_syllabus_manager {
     /**
      * Deletes given syllabus.
      * 
-     * @param ucla_syllabus $syllabus   Expecting an object that is derived from
-     *                                  the ucla_syllabus class
+     * @param syllabus $syllabus   Expecting an object that is derived from
+     *                             the syllabus class
      */
     public function delete_syllabus($syllabus) {
         global $DB;
         // Do some sanity checks.
 
         // Make sure parameter is valid object.
-        if (!is_object($syllabus) || !($syllabus instanceof ucla_syllabus) ||
+        if (!is_object($syllabus) || !($syllabus instanceof syllabus) ||
                 empty($syllabus->id)) {
             print_error('err_syllabus_notexist', 'local_ucla_syllabus');
         }
@@ -146,8 +146,8 @@ class ucla_syllabus_manager {
      * Convert between public or private syllabi.
      * 
      * @param stdClass $syllabus   Expecting an object that is derived from
-     *                             the ucla_syllabus class
-     * @param int $convertto    UCLA_SYLLABUS_TYPE_PUBLIC | UCLA_SYLLABUS_TYPE_PRIVATE
+     *                             the syllabus class
+     * @param int $convertto       SYLLABUS_TYPE_PUBLIC | SYLLABUS_TYPE_PRIVATE
      */
     public function convert_syllabus($syllabus, $convertto) {
         global $DB;
@@ -157,7 +157,7 @@ class ucla_syllabus_manager {
         }
 
         // Make sure parameter is valid object.
-        if (!is_object($syllabus) || !($syllabus instanceof ucla_syllabus) ||
+        if (!is_object($syllabus) || !($syllabus instanceof syllabus) ||
                 empty($syllabus->id)) {
             print_error('err_syllabus_notexist', 'local_ucla_syllabus');
         }
@@ -201,7 +201,7 @@ class ucla_syllabus_manager {
     }
 
     /**
-     * UCLA Site menu block hook.
+     * Site menu block hook.
      * 
      * Only display node if there is a syllabus uploaded. If no syllabus 
      * uploaded, then display node if logged in user has the ability to add one.
@@ -221,14 +221,14 @@ class ucla_syllabus_manager {
         // Is there a syllabus uploaded?
         $syllabi = $this->get_syllabi();
 
-        if (!empty($syllabi[UCLA_SYLLABUS_TYPE_PRIVATE]) &&
-                $syllabi[UCLA_SYLLABUS_TYPE_PRIVATE]->can_view()) {
+        if (!empty($syllabi[SYLLABUS_TYPE_PRIVATE]) &&
+                $syllabi[SYLLABUS_TYPE_PRIVATE]->can_view()) {
             // See if logged in user can view private syllabus.
-            $nodename = $syllabi[UCLA_SYLLABUS_TYPE_PRIVATE]->display_name;
-        } else if (!empty($syllabi[UCLA_SYLLABUS_TYPE_PUBLIC]) &&
-                $syllabi[UCLA_SYLLABUS_TYPE_PUBLIC]->can_view()) {
+            $nodename = $syllabi[SYLLABUS_TYPE_PRIVATE]->display_name;
+        } else if (!empty($syllabi[SYLLABUS_TYPE_PUBLIC]) &&
+                $syllabi[SYLLABUS_TYPE_PUBLIC]->can_view()) {
             // Fallback on trying to see if user can view public syllabus.
-            $nodename = $syllabi[UCLA_SYLLABUS_TYPE_PUBLIC]->display_name;
+            $nodename = $syllabi[SYLLABUS_TYPE_PUBLIC]->display_name;
         } else if ($this->can_manage() && !empty($USER->editing)) {
             // If no syllabus, then only show node for instructors to add a
             // syllabus when in editing mode.
@@ -252,8 +252,8 @@ class ucla_syllabus_manager {
      */
     public function get_syllabi() {
         global $DB;
-        $retval = array(UCLA_SYLLABUS_TYPE_PUBLIC => null,
-                         UCLA_SYLLABUS_TYPE_PRIVATE => null);
+        $retval = array(SYLLABUS_TYPE_PUBLIC => null,
+                         SYLLABUS_TYPE_PRIVATE => null);
 
         // Get all syllabus entries for course.
         $records = $DB->get_records('ucla_syllabus',
@@ -261,14 +261,14 @@ class ucla_syllabus_manager {
 
         foreach ($records as $record) {
             switch ($record->access_type) {
-                case UCLA_SYLLABUS_ACCESS_TYPE_PUBLIC:
-                case UCLA_SYLLABUS_ACCESS_TYPE_LOGGEDIN:
-                    $retval[UCLA_SYLLABUS_TYPE_PUBLIC] =
-                            new ucla_public_syllabus($record->id);
+                case SYLLABUS_ACCESS_TYPE_PUBLIC:
+                case SYLLABUS_ACCESS_TYPE_LOGGEDIN:
+                    $retval[SYLLABUS_TYPE_PUBLIC] =
+                            new public_syllabus($record->id);
                     break;
-                case UCLA_SYLLABUS_ACCESS_TYPE_PRIVATE:
-                    $retval[UCLA_SYLLABUS_TYPE_PRIVATE] =
-                            new ucla_private_syllabus($record->id);
+                case SYLLABUS_ACCESS_TYPE_PRIVATE:
+                    $retval[SYLLABUS_TYPE_PRIVATE] =
+                            new private_syllabus($record->id);
                     break;
             }
         }
@@ -290,7 +290,7 @@ class ucla_syllabus_manager {
         $where = 'courseid=:courseid AND access_type=:private';
         $result = $DB->get_field_select('ucla_syllabus', 'id', $where,
                 array('courseid' => $courseid,
-                      'private' => UCLA_SYLLABUS_ACCESS_TYPE_PRIVATE));
+                      'private' => SYLLABUS_ACCESS_TYPE_PRIVATE));
 
         return $result;
     }
@@ -309,8 +309,8 @@ class ucla_syllabus_manager {
         $where = 'courseid=:courseid AND (access_type=:public OR access_type=:loggedin)';
         $result = $DB->get_field_select('ucla_syllabus', 'id', $where,
                 array('courseid' => $courseid,
-                      'public' => UCLA_SYLLABUS_ACCESS_TYPE_PUBLIC,
-                      'loggedin' => UCLA_SYLLABUS_ACCESS_TYPE_LOGGEDIN));
+                      'public' => SYLLABUS_ACCESS_TYPE_PUBLIC,
+                      'loggedin' => SYLLABUS_ACCESS_TYPE_LOGGEDIN));
 
         return $result;
     }
@@ -343,11 +343,11 @@ class ucla_syllabus_manager {
 
         // Cast it to the appropiate object type.
         switch ($accesstype) {
-            case UCLA_SYLLABUS_ACCESS_TYPE_PUBLIC:
-            case UCLA_SYLLABUS_ACCESS_TYPE_LOGGEDIN:
-                return new ucla_public_syllabus($entryid);
-            case UCLA_SYLLABUS_ACCESS_TYPE_PRIVATE:
-                return new ucla_private_syllabus($entryid);
+            case SYLLABUS_ACCESS_TYPE_PUBLIC:
+            case SYLLABUS_ACCESS_TYPE_LOGGEDIN:
+                return new public_syllabus($entryid);
+            case SYLLABUS_ACCESS_TYPE_PRIVATE:
+                return new private_syllabus($entryid);
         }
 
         return null;
@@ -359,12 +359,12 @@ class ucla_syllabus_manager {
      * 
      * @param object $data  Data from syllabus form. Assumes it is validated
      * 
-     * @return int      Returns recordid of added/updated syllabus
+     * @return int          Returns recordid of added/updated syllabus
      */
     public function save_syllabus($data) {
         global $DB;
 
-        // First create a entry in ucla_syllabus.
+        // First create a entry in syllabus table.
         $syllabusentry = new stdClass();
         $recordid = null;
         $eventname = '';
@@ -426,12 +426,12 @@ class ucla_syllabus_manager {
  * @copyright   2012 UC Regents
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-abstract class ucla_syllabus {
+abstract class syllabus {
     /** 
      * Syllabus properties.
      * 
      * @var mixed In following format:
-     *                  [columns from ucla_syllabus table]
+     *                  [columns from syllabus table]
      *                  ['stored_file'] => stored_file object
      */
     private $properties = null;
@@ -471,7 +471,7 @@ abstract class ucla_syllabus {
         }
 
         if (!isset($this->properties) || !isset($this->properties->$name)) {
-            debugging('ucla_syllabus called with invalid $name: ' . $name);
+            debugging('syllabus called with invalid $name: ' . $name);
             return null;
         }
         return $this->properties->$name;
@@ -590,10 +590,10 @@ abstract class ucla_syllabus {
         // Should really have just one file uploaded, but handle weird cases.
         if (count($files) < 1 && empty($this->properties->url)) {
             // No files uploaded and no URL added!
-            debugging('Warning, no file uploaded for given ucla_syllabus entry');
+            debugging('Warning, no file uploaded for given syllabus entry');
         } else {
             if (count($files) >1) {
-                debugging('Warning, more than one syllabus file uploaded for given ucla_syllabus entry');
+                debugging('Warning, more than one syllabus file uploaded for given syllabus entry');
             }
 
             $retval = reset($files);
@@ -607,14 +607,14 @@ abstract class ucla_syllabus {
 /**
  * Private syllabus class.
  * 
- * Inherits abilities from ucla_syllabus class, but defines
+ * Inherits abilities from syllabus class, but defines
  * its own viewing function which differrs from those of
  * public syllabi.
  * 
  * @copyright   2012 UC Regents
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class ucla_private_syllabus extends ucla_syllabus {
+class private_syllabus extends syllabus {
     /**
      * Determine if user can view syllabus.
      * 
@@ -635,14 +635,14 @@ class ucla_private_syllabus extends ucla_syllabus {
 /**
  * Public syllabus class.
  * 
- * Inherits abilities from ucla_syllabus class, but defines
+ * Inherits abilities from syllabus class, but defines
  * its own viewing function which differrs from those of 
  * private syllabi.
  * 
  * @copyright   2012 UC Regents
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class ucla_public_syllabus extends ucla_syllabus {
+class public_syllabus extends syllabus {
     /**
      * Determine if user can view syllabus.
      * 
@@ -652,10 +652,10 @@ class ucla_public_syllabus extends ucla_syllabus {
         $retval = false;
         // Check access type.
         switch ($this->access_type) {
-            case UCLA_SYLLABUS_ACCESS_TYPE_PUBLIC:
+            case SYLLABUS_ACCESS_TYPE_PUBLIC:
                 $retval = true;
                 break;
-            case UCLA_SYLLABUS_ACCESS_TYPE_LOGGEDIN:
+            case SYLLABUS_ACCESS_TYPE_LOGGEDIN:
                 if (isloggedin() && !isguestuser()) {
                     $retval = true;
                 }

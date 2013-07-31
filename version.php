@@ -16,7 +16,7 @@
 
 
 /**
- * Defines the version of UCLA syllabus plugin.
+ * Defines the version of syllabus plugin.
  *
  * This code fragment is called by moodle_needs_upgrading() and
  * /admin/index.php

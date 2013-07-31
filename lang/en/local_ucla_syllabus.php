@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * English strings for UCLA syllabus plugin
+ * English strings for syllabus plugin
  *
  * @package    local_ucla_syllabus
  * @subpackage lang

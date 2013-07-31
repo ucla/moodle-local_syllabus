@@ -15,11 +15,11 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Library of interface functions and constants for UCLA syllabus.
+ * Library of interface functions and constants for syllabus.
  *
  * All the core Moodle functions, neeeded to allow the module to work
  * integrated in Moodle should be placed here.
- * All the UCLA syllabus specific functions, needed to implement all the plugin
+ * All the syllabus specific functions, needed to implement all the plugin
  * logic, should go to locallib.php. This will help to save some memory when
  * Moodle is performing actions across all modules.
  *
@@ -182,7 +182,7 @@ function local_ucla_syllabus_extends_navigation(global_navigation $navigation) {
 // File API.
 
 /**
- * Serves the files from the ucla_syllabus file areas.
+ * Serves the files from the syllabus file areas.
  * 
  * Depending on the syllabus access type, do the following checks:
  *  - Public: allow download
@@ -205,7 +205,7 @@ function local_ucla_syllabus_pluginfile($course, $cm, $context, $filearea, array
     global $DB, $CFG;
 
     // First, get syllabus file.
-    $syllabus = ucla_syllabus_manager::instance($args[0]);  // First argument should be syllabus ID.
+    $syllabus = syllabus_manager::instance($args[0]);  // First argument should be syllabus ID.
 
     // Do some sanity checks.
     if (empty($syllabus) || !(isset($syllabus->stored_file))) {

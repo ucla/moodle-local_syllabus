@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Event handlers for events.
+ * Event handlers for syllabus events.
  *
  * @package    local_ucla_syllabus
  * @copyright  2013 UC Regents
@@ -27,7 +27,7 @@ require_once($CFG->dirroot . '/local/ucla_syllabus/locallib.php');
 /**
  * Delete a course's syllabus when a course is deleted.
  *
- * NOTE: Unfortunately cannot use ucla_syllabus_manager to delete syllabus
+ * NOTE: Unfortunately cannot use syllabus_manager to delete syllabus
  * entry and files, because course context is already deleted. Need to manually
  * find the syllabus entries and delete associated files.
  *

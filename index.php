@@ -34,7 +34,7 @@ require_once($CFG->libdir . '/resourcelib.php');
 // Get script variables to be used later.
 $id = required_param('id', PARAM_INT);
 $course = $DB->get_record('course', array('id' => $id), '*', MUST_EXIST);
-$syllabusmanager = new ucla_syllabus_manager($course);
+$syllabusmanager = new syllabus_manager($course);
 $coursecontext = context_course::instance($course->id);
 $canmanagesyllabus = $syllabusmanager->can_manage();
 
@@ -63,7 +63,7 @@ if ($canmanagesyllabus) {
             array('courseid' => $course->id,
                   'action' => $action,
                   'type' => $type,
-                  'ucla_syllabus_manager' => $syllabusmanager),
+                  'syllabus_manager' => $syllabusmanager),
             'post',
             '',
             array('class' => 'syllabus_form'));
@@ -88,7 +88,7 @@ if (!empty($USER->editing) && $canmanagesyllabus) {
             // refresh site menu and prevent duplication submission of file).
 
             $url = new moodle_url('/local/ucla_syllabus/index.php',
-                    array('action' => UCLA_SYLLABUS_ACTION_VIEW,
+                    array('action' => SYLLABUS_ACTION_VIEW,
                           'id' => $course->id));
             if (isset($data->entryid)) {
                 // Syllabus was updated.
@@ -100,15 +100,15 @@ if (!empty($USER->editing) && $canmanagesyllabus) {
 
             flash_redirect($url, $successmessage);
         }
-    } else if ($action == UCLA_SYLLABUS_ACTION_DELETE) {
+    } else if ($action == SYLLABUS_ACTION_DELETE) {
         // User wants to delete syllabus.
         $syllabi = $syllabusmanager->get_syllabi();
         $todel = null;
 
-        if ($type == UCLA_SYLLABUS_TYPE_PUBLIC && !empty($syllabi[UCLA_SYLLABUS_TYPE_PUBLIC])) {
-            $todel = $syllabi[UCLA_SYLLABUS_TYPE_PUBLIC];
-        } else if ($type == UCLA_SYLLABUS_TYPE_PRIVATE && !empty($syllabi[UCLA_SYLLABUS_TYPE_PRIVATE])) {
-            $todel = $syllabi[UCLA_SYLLABUS_TYPE_PRIVATE];
+        if ($type == SYLLABUS_TYPE_PUBLIC && !empty($syllabi[SYLLABUS_TYPE_PUBLIC])) {
+            $todel = $syllabi[SYLLABUS_TYPE_PUBLIC];
+        } else if ($type == SYLLABUS_TYPE_PRIVATE && !empty($syllabi[SYLLABUS_TYPE_PRIVATE])) {
+            $todel = $syllabi[SYLLABUS_TYPE_PRIVATE];
         }
 
         if (empty($todel)) {
@@ -117,21 +117,21 @@ if (!empty($USER->editing) && $canmanagesyllabus) {
             $syllabusmanager->delete_syllabus($todel);
 
             $url = new moodle_url('/local/ucla_syllabus/index.php',
-                    array('action' => UCLA_SYLLABUS_ACTION_VIEW,
+                    array('action' => SYLLABUS_ACTION_VIEW,
                           'id' => $course->id));
             $successmessage = get_string('successful_delete', 'local_ucla_syllabus');
             flash_redirect($url, $successmessage);
         }
-    } else if ($action == UCLA_SYLLABUS_ACTION_CONVERT) {
+    } else if ($action == SYLLABUS_ACTION_CONVERT) {
         // User is converting between public or private syllabus.
         $syllabi = $syllabusmanager->get_syllabi();
 
         $convertto = 0;
-        if ($type == UCLA_SYLLABUS_TYPE_PUBLIC) {
-            $convertto = UCLA_SYLLABUS_ACCESS_TYPE_PRIVATE;
-        } else if ($type == UCLA_SYLLABUS_TYPE_PRIVATE) {
+        if ($type == SYLLABUS_TYPE_PUBLIC) {
+            $convertto = SYLLABUS_ACCESS_TYPE_PRIVATE;
+        } else if ($type == SYLLABUS_TYPE_PRIVATE) {
             // Using the stricter version of public - require user login.
-            $convertto = UCLA_SYLLABUS_ACCESS_TYPE_LOGGEDIN;
+            $convertto = SYLLABUS_ACCESS_TYPE_LOGGEDIN;
         }
 
         if ($convertto == 0) {
@@ -140,10 +140,10 @@ if (!empty($USER->editing) && $canmanagesyllabus) {
             $syllabusmanager->convert_syllabus($syllabi[$type], $convertto);
 
             $url = new moodle_url('/local/ucla_syllabus/index.php',
-                    array('action' => UCLA_SYLLABUS_ACTION_VIEW,
+                    array('action' => SYLLABUS_ACTION_VIEW,
                           'id' => $course->id));
 
-            if ($convertto == UCLA_SYLLABUS_ACCESS_TYPE_PRIVATE) {
+            if ($convertto == SYLLABUS_ACCESS_TYPE_PRIVATE) {
                 $successmessage = get_string('successful_restrict', 'local_ucla_syllabus');
             } else {
                 $successmessage = get_string('successful_unrestrict', 'local_ucla_syllabus');
@@ -162,14 +162,14 @@ if (!empty($USER->editing) && $canmanagesyllabus) {
     $syllabi = $syllabusmanager->get_syllabi();
 
      $syllabustodisplay = null;
-    if (!empty($syllabi[UCLA_SYLLABUS_TYPE_PRIVATE]) &&
-            $syllabi[UCLA_SYLLABUS_TYPE_PRIVATE]->can_view()) {
+    if (!empty($syllabi[SYLLABUS_TYPE_PRIVATE]) &&
+            $syllabi[SYLLABUS_TYPE_PRIVATE]->can_view()) {
         // See if logged in user can view private syllabus.
-        $syllabustodisplay = $syllabi[UCLA_SYLLABUS_TYPE_PRIVATE];
-    } else if (!empty($syllabi[UCLA_SYLLABUS_TYPE_PUBLIC]) &&
-            $syllabi[UCLA_SYLLABUS_TYPE_PUBLIC]->can_view()) {
+        $syllabustodisplay = $syllabi[SYLLABUS_TYPE_PRIVATE];
+    } else if (!empty($syllabi[SYLLABUS_TYPE_PUBLIC]) &&
+            $syllabi[SYLLABUS_TYPE_PUBLIC]->can_view()) {
         // Fallback on trying to see if user can view public syllabus.
-        $syllabustodisplay = $syllabi[UCLA_SYLLABUS_TYPE_PUBLIC];
+        $syllabustodisplay = $syllabi[SYLLABUS_TYPE_PUBLIC];
     }
 
     // Set up what to display.
@@ -178,9 +178,9 @@ if (!empty($USER->editing) && $canmanagesyllabus) {
         $title = get_string('display_name_default', 'local_ucla_syllabus');
 
         $errorstring = '';
-        if (!empty($syllabi[UCLA_SYLLABUS_TYPE_PUBLIC])) {
+        if (!empty($syllabi[SYLLABUS_TYPE_PUBLIC])) {
             $errorstring = get_string('cannot_view_public_syllabus', 'local_ucla_syllabus');
-        } else if (!empty($syllabi[UCLA_SYLLABUS_TYPE_PRIVATE])) {
+        } else if (!empty($syllabi[SYLLABUS_TYPE_PRIVATE])) {
             $errorstring = get_string('cannot_view_private_syllabus', 'local_ucla_syllabus');
         } else {
             $errorstring = get_string('no_syllabus_uploaded', 'local_ucla_syllabus');
@@ -223,7 +223,7 @@ if (!empty($USER->editing) && $canmanagesyllabus) {
         // If this is a preview syllabus, give some disclaimer text.
         $disclaimertext = '';
         $typetext = '';
-        if ($syllabustodisplay instanceof ucla_public_syllabus) {
+        if ($syllabustodisplay instanceof public_syllabus) {
             if ($syllabustodisplay->is_preview) {
                 $typetext = get_string('preview', 'local_ucla_syllabus');
                 $disclaimertext = get_string('preview_disclaimer', 'local_ucla_syllabus');

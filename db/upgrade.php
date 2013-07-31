@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * This file keeps track of upgrades to the UCLA syllabus plugin.
+ * This file keeps track of upgrades to the syllabus plugin.
  *
  * Sometimes, changes between versions involve alterations to database
  * structures and other major things that may break installations. The upgrade
@@ -33,7 +33,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * Execute UCLA syllabus plugin upgrade from the given old version.
+ * Execute syllabus plugin upgrade from the given old version.
  *
  * @param int $oldversion
  * @return bool
@@ -52,7 +52,7 @@ function xmldb_local_ucla_syllabus_upgrade($oldversion) {
 
     if ($oldversion < 2012120700) {
 
-        // Define field url to be added to ucla_syllabus.
+        // Define field url to be added to syllabus table.
         $table = new xmldb_table('ucla_syllabus');
         $field = new xmldb_field('url', XMLDB_TYPE_CHAR, '255', null, null, null, null, 'is_preview');
 

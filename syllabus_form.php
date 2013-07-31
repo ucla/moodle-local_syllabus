@@ -63,17 +63,17 @@ class syllabus_form extends moodleform {
         if (isset($this->_customdata['type'])) {
             $this->type = $this->_customdata['type'];
         }
-        $this->syllabusmanager = $this->_customdata['ucla_syllabus_manager'];
+        $this->syllabusmanager = $this->_customdata['syllabus_manager'];
 
         // Get course syllabi.
         $syllabi = $this->syllabusmanager->get_syllabi();
 
-        if ($this->action == UCLA_SYLLABUS_ACTION_EDIT ||
-                $this->action == UCLA_SYLLABUS_ACTION_ADD) {
-            if ($this->type == UCLA_SYLLABUS_TYPE_PUBLIC) {
-                $this->display_public_syllabus($syllabi[UCLA_SYLLABUS_TYPE_PUBLIC]);
-            } else if ($this->type == UCLA_SYLLABUS_TYPE_PRIVATE) {
-                $this->display_private_syllabus($syllabi[UCLA_SYLLABUS_TYPE_PRIVATE]);
+        if ($this->action == SYLLABUS_ACTION_EDIT ||
+                $this->action == SYLLABUS_ACTION_ADD) {
+            if ($this->type == SYLLABUS_TYPE_PUBLIC) {
+                $this->display_public_syllabus($syllabi[SYLLABUS_TYPE_PUBLIC]);
+            } else if ($this->type == SYLLABUS_TYPE_PRIVATE) {
+                $this->display_private_syllabus($syllabi[SYLLABUS_TYPE_PRIVATE]);
             }
 
             $mform->addElement('hidden', 'action', $this->action);
@@ -81,13 +81,13 @@ class syllabus_form extends moodleform {
             $mform->addElement('hidden', 'id', $this->courseid);
         } else {
             // If viewing, then display both public/private syllabus forums.
-            if (empty($syllabi[UCLA_SYLLABUS_TYPE_PUBLIC]) &&
-                    empty($syllabi[UCLA_SYLLABUS_TYPE_PRIVATE])) {
+            if (empty($syllabi[SYLLABUS_TYPE_PUBLIC]) &&
+                    empty($syllabi[SYLLABUS_TYPE_PRIVATE])) {
                 $mform->addElement('html', $OUTPUT->notification(
                         get_string('no_syllabus', 'local_ucla_syllabus')));
             }
-            $this->display_public_syllabus($syllabi[UCLA_SYLLABUS_TYPE_PUBLIC]);
-            $this->display_private_syllabus($syllabi[UCLA_SYLLABUS_TYPE_PRIVATE]);
+            $this->display_public_syllabus($syllabi[SYLLABUS_TYPE_PUBLIC]);
+            $this->display_private_syllabus($syllabi[SYLLABUS_TYPE_PRIVATE]);
         }
     }
 
@@ -109,16 +109,16 @@ class syllabus_form extends moodleform {
 
         // Check if access_type is valid value.
         if (!in_array($data['access_types']['access_type'],
-                array(UCLA_SYLLABUS_ACCESS_TYPE_PUBLIC,
-                      UCLA_SYLLABUS_ACCESS_TYPE_LOGGEDIN,
-                      UCLA_SYLLABUS_ACCESS_TYPE_PRIVATE))) {
+                array(SYLLABUS_ACCESS_TYPE_PUBLIC,
+                      SYLLABUS_ACCESS_TYPE_LOGGEDIN,
+                      SYLLABUS_ACCESS_TYPE_PRIVATE))) {
             $err['access_types'] = get_string('access_invalid', 'local_ucla_syllabus');
         }
 
         // See if working with private syllabus file.
-        if ($this->type == UCLA_SYLLABUS_TYPE_PRIVATE) {
+        if ($this->type == SYLLABUS_TYPE_PRIVATE) {
             // Make sure that access_type is private.
-            $data['access_types']['access_type'] = UCLA_SYLLABUS_ACCESS_TYPE_PRIVATE;
+            $data['access_types']['access_type'] = SYLLABUS_ACCESS_TYPE_PRIVATE;
         }
 
         // Need to make sure we have URL or file.
@@ -169,7 +169,7 @@ class syllabus_form extends moodleform {
      *  - If private syllabus is uploaded, then don't display form, just 
      *    filename and ability to edit or delete
      * 
-     * @param ucla_private_syllabus $existingsyllabus
+     * @param private_syllabus $existingsyllabus
      */
     private function display_private_syllabus($existingsyllabus=null) {
         $mform = $this->_form;
@@ -178,8 +178,8 @@ class syllabus_form extends moodleform {
                 get_string('private_syllabus', 'local_ucla_syllabus'));
 
         // Show upload form if user is editing.
-        if ($this->action == UCLA_SYLLABUS_ACTION_EDIT ||
-                $this->action == UCLA_SYLLABUS_ACTION_ADD) {
+        if ($this->action == SYLLABUS_ACTION_EDIT ||
+                $this->action == SYLLABUS_ACTION_ADD) {
             $this->display_private_syllabus_form($existingsyllabus);
         } else {
             $mform->addElement('html', html_writer::tag('div',
@@ -193,16 +193,16 @@ class syllabus_form extends moodleform {
                 $editlink = html_writer::link(
                         new moodle_url('/local/ucla_syllabus/index.php',
                             array('id' => $this->courseid,
-                                  'action' => UCLA_SYLLABUS_ACTION_EDIT,
-                                  'type' => UCLA_SYLLABUS_TYPE_PRIVATE)),
+                                  'action' => SYLLABUS_ACTION_EDIT,
+                                  'type' => SYLLABUS_TYPE_PRIVATE)),
                         get_string('edit'));
                 $makepubliclink = '';
-                if (! ucla_syllabus_manager::has_public_syllabus($this->courseid)) {
+                if (! syllabus_manager::has_public_syllabus($this->courseid)) {
                     $makepubliclink = html_writer::link(
                             new moodle_url('/local/ucla_syllabus/index.php',
                                 array('id' => $this->courseid,
-                                    'action' => UCLA_SYLLABUS_ACTION_CONVERT,
-                                    'type' => UCLA_SYLLABUS_TYPE_PRIVATE)),
+                                    'action' => SYLLABUS_ACTION_CONVERT,
+                                    'type' => SYLLABUS_TYPE_PRIVATE)),
                             get_string('make_public', 'local_ucla_syllabus'));
                 }
 
@@ -211,8 +211,8 @@ class syllabus_form extends moodleform {
                 $deletelink = html_writer::link(
                         new moodle_url('/local/ucla_syllabus/index.php',
                             array('id' => $this->courseid,
-                                  'action' => UCLA_SYLLABUS_ACTION_DELETE,
-                                  'type' => UCLA_SYLLABUS_TYPE_PRIVATE)),
+                                  'action' => SYLLABUS_ACTION_DELETE,
+                                  'type' => SYLLABUS_TYPE_PRIVATE)),
                         get_string('delete'),
                         array('onclick' => 'return confirm("'.get_string('confirm_deletion', 'local_ucla_syllabus').'")'));
 
@@ -223,8 +223,8 @@ class syllabus_form extends moodleform {
                 // No syllabus added, so give a "add syllabus now" link.
                 $url = new moodle_url('/local/ucla_syllabus/index.php',
                             array('id' => $this->courseid,
-                                  'action' => UCLA_SYLLABUS_ACTION_ADD,
-                                  'type' => UCLA_SYLLABUS_TYPE_PRIVATE));
+                                  'action' => SYLLABUS_ACTION_ADD,
+                                  'type' => SYLLABUS_TYPE_PRIVATE));
                 $text = get_string('private_syllabus_add', 'local_ucla_syllabus');
                 $link = html_writer::link($url, $text);
                 $mform->addElement('html', $link);
@@ -240,7 +240,7 @@ class syllabus_form extends moodleform {
      *  - If public syllabus is uploaded, then don't display form, just filename
      *    and ability to edit or delete
      * 
-     * @param ucla_public_syllabus $existingsyllabus
+     * @param public_syllabus $existingsyllabus
      */
     private function display_public_syllabus($existingsyllabus=null) {
         $mform = $this->_form;
@@ -249,8 +249,8 @@ class syllabus_form extends moodleform {
                 get_string('public_syllabus', 'local_ucla_syllabus'));
 
         // Show upload form if user is editing.
-        if ($this->action == UCLA_SYLLABUS_ACTION_EDIT ||
-                $this->action == UCLA_SYLLABUS_ACTION_ADD) {
+        if ($this->action == SYLLABUS_ACTION_EDIT ||
+                $this->action == SYLLABUS_ACTION_ADD) {
             $this->display_public_syllabus_form($existingsyllabus);
         } else {
             $mform->addElement('html', html_writer::tag('div',
@@ -264,16 +264,16 @@ class syllabus_form extends moodleform {
                 $editlink = html_writer::link(
                         new moodle_url('/local/ucla_syllabus/index.php',
                             array('id' => $this->courseid,
-                                  'action' => UCLA_SYLLABUS_ACTION_EDIT,
-                                  'type' => UCLA_SYLLABUS_TYPE_PUBLIC)),
+                                  'action' => SYLLABUS_ACTION_EDIT,
+                                  'type' => SYLLABUS_TYPE_PUBLIC)),
                         get_string('edit'));
                 $makeprivatelink = '';
-                if (!ucla_syllabus_manager::has_private_syllabus($this->courseid)) {
+                if (!syllabus_manager::has_private_syllabus($this->courseid)) {
                     $makeprivatelink = html_writer::link(
                             new moodle_url('/local/ucla_syllabus/index.php',
                                 array('id' => $this->courseid,
-                                    'action' => UCLA_SYLLABUS_ACTION_CONVERT,
-                                    'type' => UCLA_SYLLABUS_TYPE_PUBLIC)),
+                                    'action' => SYLLABUS_ACTION_CONVERT,
+                                    'type' => SYLLABUS_TYPE_PUBLIC)),
                             get_string('make_private', 'local_ucla_syllabus'));
                 }
 
@@ -282,8 +282,8 @@ class syllabus_form extends moodleform {
                 $deletelink = html_writer::link(
                         new moodle_url('/local/ucla_syllabus/index.php',
                             array('id' => $this->courseid,
-                                  'action' => UCLA_SYLLABUS_ACTION_DELETE,
-                                  'type' => UCLA_SYLLABUS_TYPE_PUBLIC)),
+                                  'action' => SYLLABUS_ACTION_DELETE,
+                                  'type' => SYLLABUS_TYPE_PUBLIC)),
                         get_string('delete'),
                         array('onclick' => 'return confirm("'.get_string('confirm_deletion', 'local_ucla_syllabus').'")'));
 
@@ -294,8 +294,8 @@ class syllabus_form extends moodleform {
                 // No syllabus added, so give a "add syllabus now" link.
                 $url = new moodle_url('/local/ucla_syllabus/index.php',
                             array('id' => $this->courseid,
-                                  'action' => UCLA_SYLLABUS_ACTION_ADD,
-                                  'type' => UCLA_SYLLABUS_TYPE_PUBLIC));
+                                  'action' => SYLLABUS_ACTION_ADD,
+                                  'type' => SYLLABUS_TYPE_PUBLIC));
                 $text = get_string('public_syllabus_add', 'local_ucla_syllabus');
                 $link = html_writer::link($url, $text);
                 $mform->addElement('html', $link);
@@ -326,7 +326,7 @@ class syllabus_form extends moodleform {
                 array('size'=>'50'));
 
         // Show access type.
-        $mform->addElement('hidden', 'access_types[access_type]', UCLA_SYLLABUS_ACCESS_TYPE_PRIVATE);
+        $mform->addElement('hidden', 'access_types[access_type]', SYLLABUS_ACCESS_TYPE_PRIVATE);
 
         // Show display name.
         $mform->addElement('text', 'display_name', get_string('display_name', 'local_ucla_syllabus'));
@@ -388,10 +388,10 @@ class syllabus_form extends moodleform {
         $accesstypes = array();
         $accesstypes[] = $mform->createElement('radio', 'access_type', '',
                 get_string('accesss_loggedin_info', 'local_ucla_syllabus'),
-                UCLA_SYLLABUS_ACCESS_TYPE_LOGGEDIN);
+                SYLLABUS_ACCESS_TYPE_LOGGEDIN);
         $accesstypes[] = $mform->createElement('radio', 'access_type', '',
                 get_string('accesss_public_info', 'local_ucla_syllabus'),
-                UCLA_SYLLABUS_ACCESS_TYPE_PUBLIC);
+                SYLLABUS_ACCESS_TYPE_PUBLIC);
         $mform->addGroup($accesstypes, 'access_types', $label,
                 html_writer::empty_tag('br'));
         $mform->addGroupRule('access_types',
@@ -409,7 +409,7 @@ class syllabus_form extends moodleform {
         // Set defaults or use existing syllabus.
         $defaults = array();
         if (empty($existingsyllabus)) {
-            $defaults['access_types[access_type]'] = UCLA_SYLLABUS_ACCESS_TYPE_LOGGEDIN;
+            $defaults['access_types[access_type]'] = SYLLABUS_ACCESS_TYPE_LOGGEDIN;
             $defaults['display_name'] = get_string('display_name_default', 'local_ucla_syllabus');
             $mform->setDefaults($defaults);
         } else {
@@ -440,14 +440,14 @@ class syllabus_form extends moodleform {
      * Helper function to generate output to display syllabus information for
      * use in a form.
      *
-     * @param ucla_syllabus $syllabus
+     * @param syllabus $syllabus
      */
     protected function display_syllabus_info($syllabus) {
         global $CFG;
 
-        $syllabusinfo = array(UCLA_SYLLABUS_ACCESS_TYPE_PUBLIC => 'public_world',
-                               UCLA_SYLLABUS_ACCESS_TYPE_LOGGEDIN => 'public_loggedin',
-                               UCLA_SYLLABUS_ACCESS_TYPE_PRIVATE => 'private');
+        $syllabusinfo = array(SYLLABUS_ACCESS_TYPE_PUBLIC => 'public_world',
+                              SYLLABUS_ACCESS_TYPE_LOGGEDIN => 'public_loggedin',
+                              SYLLABUS_ACCESS_TYPE_PRIVATE => 'private');
         $syllabustype = $syllabusinfo[$syllabus->access_type];
         $imagestring = get_string('icon_'.$syllabustype.'_syllabus', 'local_ucla_syllabus');
 
@@ -469,7 +469,7 @@ class syllabus_form extends moodleform {
 
         $typetext = '';
         if ($syllabus->is_preview &&
-                $syllabus->access_type != UCLA_SYLLABUS_ACCESS_TYPE_PRIVATE) {
+                $syllabus->access_type != SYLLABUS_ACCESS_TYPE_PRIVATE) {
             $typetext = sprintf('(%s)',
                     get_string('preview', 'local_ucla_syllabus'));
         }
