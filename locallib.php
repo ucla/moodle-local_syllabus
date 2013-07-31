@@ -674,9 +674,6 @@ class ucla_public_syllabus extends ucla_syllabus {
  * Code copied from fragments of code in course/view.php to set the "Turn 
  * editing on/off" button.
  * 
- * @global object $OUTPUT
- * @global object $PAGE
- * @global object $USER
  * 
  * @param moodle_url $url   Expecting moodle_url object. If null, then defaults
  *                          redirecting user to $PAGE->url
@@ -692,7 +689,7 @@ function set_editing_mode_button($url=null) {
     $edit = optional_param('edit', -1, PARAM_BOOL);
     if (!isset($USER->editing)) {
         $USER->editing = 0;
-    }  
+    }
     if ($PAGE->user_allowed_editing()) {
         if (($edit == 1) and confirm_sesskey()) {
             $USER->editing = 1;
@@ -700,9 +697,9 @@ function set_editing_mode_button($url=null) {
             redirect($url);
         } else if (($edit == 0) and confirm_sesskey()) {
             $USER->editing = 0;
-            if(!empty($USER->activitycopy) && $USER->activitycopycourse == $course->id) {
+            if (!empty($USER->activitycopy) && $USER->activitycopycourse == $course->id) {
                 $USER->activitycopy       = false;
-                $USER->activitycopycourse = NULL;
+                $USER->activitycopycourse = null;
             }
             // Edited to use url specified in function.
             redirect($url);
@@ -731,10 +728,10 @@ function flash_display() {
  * via flash_display()
  *
  * @param moodle_url|string $url A moodle_url to redirect to. Strings are not to be trusted!
- * @param string $success_msg The message to display to the user
+ * @param string $successmessage The message to display to the user
  */
-function flash_redirect($url, $success_msg) {
+function flash_redirect($url, $successmessage) {
     // Message to indicate to user that content was edited.
-    $_SESSION['flash_success_msg']  = $success_msg;
+    $_SESSION['flash_success_msg']  = $successmessage;
     redirect($url);
 }

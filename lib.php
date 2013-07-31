@@ -147,7 +147,11 @@ function local_ucla_syllabus_get_extra_capabilities() {
 /**
  * Add syllabus tool to the navigation block.
  * 
- * @param $navigation The global navigation context
+ * Finds a course in the navigation block, and inserts a link to the syllabus
+ * page (either to upload a syllabus, or to view an existing one) for the
+ * appropriate course.
+ * 
+ * @param global_navigation $navigation The global navigation context
  */
 function local_ucla_syllabus_extends_navigation(global_navigation $navigation) {
     global $CFG, $PAGE;
