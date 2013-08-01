@@ -23,7 +23,7 @@
  * logic, should go to locallib.php. This will help to save some memory when
  * Moodle is performing actions across all modules.
  *
- * @package    local_ucla_syllabus
+ * @package    local_syllabus
  * @copyright  2012 UC Regents
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -48,7 +48,7 @@ require_once(dirname(__FILE__).'/locallib.php');
  * @param stdClass $newmodule the module instance record
  * @return stdClass|null
  */
-function local_ucla_syllabus_user_outline($course, $user, $mod, $newmodule) {
+function local_syllabus_user_outline($course, $user, $mod, $newmodule) {
 
     $return = new stdClass();
     $return->time = 0;
@@ -68,7 +68,7 @@ function local_ucla_syllabus_user_outline($course, $user, $mod, $newmodule) {
  * @param stdClass $newmodule the module instance record
  * @return void, is supposed to echp directly
  */
-function local_ucla_syllabus_user_complete($course, $user, $mod, $newmodule) {
+function local_syllabus_user_complete($course, $user, $mod, $newmodule) {
 }
 
 /**
@@ -83,7 +83,7 @@ function local_ucla_syllabus_user_complete($course, $user, $mod, $newmodule) {
  * @param object $timestart timestamp of activity
  * @return bool
  */
-function local_ucla_syllabus_print_recent_activity($course, $viewfullnames, $timestart) {
+function local_syllabus_print_recent_activity($course, $viewfullnames, $timestart) {
     return false;  // True if anything was printed, otherwise false.
 }
 
@@ -103,7 +103,7 @@ function local_ucla_syllabus_print_recent_activity($course, $viewfullnames, $tim
  * @param int $groupid check for a particular group's activity only, defaults to 0 (all groups)
  * @return void adds items into $activities and increases $index
  */
-function local_ucla_syllabus_get_recent_mod_activity(&$activities, &$index, $timestart, $courseid, $cmid, $userid=0, $groupid=0) {
+function local_syllabus_get_recent_mod_activity(&$activities, &$index, $timestart, $courseid, $cmid, $userid=0, $groupid=0) {
 }
 
 /**
@@ -119,7 +119,7 @@ function local_ucla_syllabus_get_recent_mod_activity(&$activities, &$index, $tim
  * @param bool $viewfullnames
  * @return void
  */
-function local_ucla_syllabus_print_recent_mod_activity($activity, $courseid, $detail, $modnames, $viewfullnames) {
+function local_syllabus_print_recent_mod_activity($activity, $courseid, $detail, $modnames, $viewfullnames) {
 }
 
 /**
@@ -131,7 +131,7 @@ function local_ucla_syllabus_print_recent_mod_activity($activity, $courseid, $de
  *
  * @return bool
  **/
-function local_ucla_syllabus_cron () {
+function local_syllabus_cron () {
     return true;
 }
 
@@ -140,7 +140,7 @@ function local_ucla_syllabus_cron () {
  *
  * @return array
  */
-function local_ucla_syllabus_get_extra_capabilities() {
+function local_syllabus_get_extra_capabilities() {
     return array();
 }
 
@@ -153,7 +153,7 @@ function local_ucla_syllabus_get_extra_capabilities() {
  * 
  * @param global_navigation $navigation The global navigation context
  */
-function local_ucla_syllabus_extends_navigation(global_navigation $navigation) {
+function local_syllabus_extends_navigation(global_navigation $navigation) {
     global $PAGE;
 
     // Get course information.
@@ -195,7 +195,7 @@ function local_ucla_syllabus_extends_navigation(global_navigation $navigation) {
  *  - Logged in: check to see if user is logged in
  *  - Private: check to see if user is associated with course
  *
- * @package local_ucla_syllabus
+ * @package local_syllabus
  * @category files
  *
  * @param stdClass $course the course object
@@ -206,7 +206,7 @@ function local_ucla_syllabus_extends_navigation(global_navigation $navigation) {
  * @param bool $forcedownload whether or not force download
  * @param array $options additional options affecting the file serving
  */
-function local_ucla_syllabus_pluginfile($course, $cm, $context, $filearea, array $args, $forcedownload, array $options=array()) {
+function local_syllabus_pluginfile($course, $cm, $context, $filearea, array $args, $forcedownload, array $options=array()) {
     require_once(dirname(__FILE__).'/locallib.php');
     global $DB, $CFG;
 
@@ -220,7 +220,7 @@ function local_ucla_syllabus_pluginfile($course, $cm, $context, $filearea, array
     } else if ($syllabus->courseid != $course->id ||
             $syllabus->stored_file->get_contextid() != $context->id) {
         // Given file doesn't belong to given course.
-        print_error('err_syllabus_mismatch', 'local_ucla_syllabus');
+        print_error('err_syllabus_mismatch', 'local_syllabus');
     }
 
     // See if syllabus allows itself to be viewed.
@@ -228,6 +228,6 @@ function local_ucla_syllabus_pluginfile($course, $cm, $context, $filearea, array
         // Finally, send the file.
         send_stored_file($syllabus->stored_file, 86400, 0, $forcedownload);
     } else {
-        print_error('err_syllabus_not_allowed', 'local_ucla_syllabus');
+        print_error('err_syllabus_not_allowed', 'local_syllabus');
     }
 }

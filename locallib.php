@@ -23,7 +23,7 @@
  * logic, should go to locallib.php. This will help to save some memory when
  * Moodle is performing actions across all modules.
  *
- * @package    local_ucla_syllabus
+ * @package    local_syllabus
  * @copyright  2012 UC Regents
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -83,7 +83,7 @@ class syllabus_manager {
      */
     public function can_manage() {
         $coursecontext = context_course::instance($this->courseid);
-        return has_capability('local/ucla_syllabus:managesyllabus',
+        return has_capability('local/syllabus:managesyllabus',
                 $coursecontext);
     }
 
@@ -100,12 +100,12 @@ class syllabus_manager {
         // Make sure parameter is valid object.
         if (!is_object($syllabus) || !($syllabus instanceof syllabus) ||
                 empty($syllabus->id)) {
-            print_error('err_syllabus_notexist', 'local_ucla_syllabus');
+            print_error('err_syllabus_notexist', 'local_syllabus');
         }
 
         // Make sure that syllabus belongs to course.
         if ($syllabus->courseid != $this->courseid) {
-            print_error('err_syllabus_mismatch', 'local_ucla_syllabus');
+            print_error('err_syllabus_mismatch', 'local_syllabus');
         }
 
         // First, delete files if they exist.  We may have URL-only syllabus.
@@ -114,7 +114,7 @@ class syllabus_manager {
         }
 
         // Next, delete entry in syllabus table.
-        $DB->delete_records('ucla_syllabus', array('id' => $syllabus->id));
+        $DB->delete_records('syllabus', array('id' => $syllabus->id));
 
         // Data to handle events.
         $data = new stdClass();
@@ -122,7 +122,7 @@ class syllabus_manager {
         $data->access_type = $syllabus->access_type;
 
         // Trigger necessary events.
-        events_trigger('ucla_syllabus_deleted', $data);
+        events_trigger('syllabus_deleted', $data);
     }
 
     /**
@@ -136,18 +136,18 @@ class syllabus_manager {
         global $DB;
 
         if (empty($syllabus)) {
-            print_error('err_syllabus_notexist', 'local_ucla_syllabus');
+            print_error('err_syllabus_notexist', 'local_syllabus');
         }
 
         // Make sure parameter is valid object.
         if (!is_object($syllabus) || !($syllabus instanceof syllabus) ||
                 empty($syllabus->id)) {
-            print_error('err_syllabus_notexist', 'local_ucla_syllabus');
+            print_error('err_syllabus_notexist', 'local_syllabus');
         }
 
         // Make sure that syllabus belongs to course.
         if ($syllabus->courseid != $this->courseid) {
-            print_error('err_syllabus_mismatch', 'local_ucla_syllabus');
+            print_error('err_syllabus_mismatch', 'local_syllabus');
         }
 
         // If a public and private syllabus already exists, then we cannot
@@ -155,7 +155,7 @@ class syllabus_manager {
         if (self::has_public_syllabus($this->courseid) &&
                 self::has_private_syllabus($this->courseid)
                 ) {
-            print_error('err_syllabus_convert', 'local_ucla_syllabus');
+            print_error('err_syllabus_convert', 'local_syllabus');
         }
 
         $data = new StdClass();
@@ -164,14 +164,14 @@ class syllabus_manager {
         $data->display_name = $syllabus->display_name;
         $data->access_type = $convertto;
         $data->is_preview = $syllabus->is_preview;
-        $DB->update_record('ucla_syllabus', $data);
+        $DB->update_record('syllabus', $data);
 
         $olddata = $data;
         $olddata->access_type = $syllabus->access_type;
 
         // Trigger events.
-        events_trigger('ucla_syllabus_deleted', $olddata);
-        events_trigger('ucla_syllabus_added', $data);
+        events_trigger('syllabus_deleted', $olddata);
+        events_trigger('syllabus_added', $data);
     }
 
     /**
@@ -210,10 +210,10 @@ class syllabus_manager {
         } else if ($this->can_manage() && !empty($USER->editing)) {
             // If no syllabus, then only show node for instructors to add a
             // syllabus when in editing mode.
-            $nodename = get_string('syllabus_needs_setup', 'local_ucla_syllabus');
+            $nodename = get_string('syllabus_needs_setup', 'local_syllabus');
         }
         if (!empty($nodename)) {
-            $url = new moodle_url('/local/ucla_syllabus/index.php',
+            $url = new moodle_url('/local/syllabus/index.php',
                     array('id' => $this->courseid));
             $retval = navigation_node::create($nodename, $url,
                     navigation_node::TYPE_SECTION);
@@ -233,7 +233,7 @@ class syllabus_manager {
                          SYLLABUS_TYPE_PRIVATE => null);
 
         // Get all syllabus entries for course.
-        $records = $DB->get_records('ucla_syllabus',
+        $records = $DB->get_records('syllabus',
                 array('courseid' => $this->courseid));
 
         foreach ($records as $record) {
@@ -265,7 +265,7 @@ class syllabus_manager {
         global $DB;
 
         $where = 'courseid=:courseid AND access_type=:private';
-        $result = $DB->get_field_select('ucla_syllabus', 'id', $where,
+        $result = $DB->get_field_select('syllabus', 'id', $where,
                 array('courseid' => $courseid,
                       'private' => SYLLABUS_ACCESS_TYPE_PRIVATE));
 
@@ -284,7 +284,7 @@ class syllabus_manager {
         global $DB;
 
         $where = 'courseid=:courseid AND (access_type=:public OR access_type=:loggedin)';
-        $result = $DB->get_field_select('ucla_syllabus', 'id', $where,
+        $result = $DB->get_field_select('syllabus', 'id', $where,
                 array('courseid' => $courseid,
                       'public' => SYLLABUS_ACCESS_TYPE_PUBLIC,
                       'loggedin' => SYLLABUS_ACCESS_TYPE_LOGGEDIN));
@@ -301,7 +301,7 @@ class syllabus_manager {
     public function has_syllabus() {
         global $DB;
 
-        return $DB->record_exists('ucla_syllabus',
+        return $DB->record_exists('syllabus',
                 array('courseid' => $this->courseid));
     }
 
@@ -315,7 +315,7 @@ class syllabus_manager {
         global $DB;
 
         // First find access_type so we know which.
-        $accesstype = $DB->get_field('ucla_syllabus', 'access_type',
+        $accesstype = $DB->get_field('syllabus', 'access_type',
                 array('id' => $entryid));
 
         // Cast it to the appropiate object type.
@@ -357,34 +357,34 @@ class syllabus_manager {
             // If id passed, then we are updating a current record.
 
             // Do quick sanity check to make sure that syllabus entry exists.
-            $result = $DB->record_exists('ucla_syllabus', array('id' => $data->entryid,
+            $result = $DB->record_exists('syllabus', array('id' => $data->entryid,
                     'courseid' => $data->id));
             if (empty($result)) {
-                print_error(get_string('err_syllabus_mismatch', 'local_ucla_syllabus'));
+                print_error(get_string('err_syllabus_mismatch', 'local_syllabus'));
             }
             $recordid = $data->entryid;
             $syllabusentry->id = $data->entryid;
 
-            $DB->update_record('ucla_syllabus', $syllabusentry);
+            $DB->update_record('syllabus', $syllabusentry);
 
-            $eventname = 'ucla_syllabus_updated';
+            $eventname = 'syllabus_updated';
         } else {
             // Save when this syllabi was created.
             $syllabusentry->timecreated  = time();
 
             // Insert new record.
-            $recordid = $DB->insert_record('ucla_syllabus', $syllabusentry);
+            $recordid = $DB->insert_record('syllabus', $syllabusentry);
             if (empty($recordid)) {
-                print_error(get_string('cannnot_make_db_entry', 'local_ucla_syllabus'));
+                print_error(get_string('cannnot_make_db_entry', 'local_syllabus'));
             }
 
-            $eventname = 'ucla_syllabus_added';
+            $eventname = 'syllabus_added';
         }
 
         // Then save file, with link to syllabus.
         $coursecontext = context_course::instance($this->courseid);
         file_save_draft_area_files($data->syllabus_file,
-                $coursecontext->id, 'local_ucla_syllabus', 'syllabus',
+                $coursecontext->id, 'local_syllabus', 'syllabus',
                 $recordid, $this->filemanagerconfig);
 
         // No errors, so trigger events.
@@ -424,7 +424,7 @@ abstract class syllabus {
     public function __construct($syllabusid=null) {
         global $DB;
         if (!empty($syllabusid)) {
-            $this->properties = $DB->get_record('ucla_syllabus', array('id' => $syllabusid));
+            $this->properties = $DB->get_record('syllabus', array('id' => $syllabusid));
             if (empty($this->properties)) {
                 throw moodle_exception('Invalid syllabus id');
             }
@@ -507,7 +507,7 @@ abstract class syllabus {
             return '';
         }
         $string = html_writer::link($fullurl, get_string('clicktodownload',
-                'local_ucla_syllabus', $this->properties->display_name));
+                'local_syllabus', $this->properties->display_name));
 
         return $string;
     }
@@ -526,7 +526,7 @@ abstract class syllabus {
 
         $file = $this->stored_file;
 
-        $url = "{$CFG->wwwroot}/pluginfile.php/{$file->get_contextid()}/local_ucla_syllabus/syllabus";
+        $url = "{$CFG->wwwroot}/pluginfile.php/{$file->get_contextid()}/local_syllabus/syllabus";
         $file = $this->stored_file;
         $filename = $file->get_filename();
         $fileurl = $url.$file->get_filepath().$file->get_itemid().'/'.$filename;
@@ -561,7 +561,7 @@ abstract class syllabus {
 
         $coursecontext = context_course::instance($this->properties->courseid);
         $fs = get_file_storage();
-        $files = $fs->get_area_files($coursecontext->id, 'local_ucla_syllabus',
+        $files = $fs->get_area_files($coursecontext->id, 'local_syllabus',
                 'syllabus', $this->properties->id, '', false);
 
         // Should really have just one file uploaded, but handle weird cases.
@@ -605,7 +605,7 @@ class private_syllabus extends syllabus {
             $coursecontext = context_course::instance($this->courseid);
         }
         return is_enrolled($coursecontext) ||
-                has_capability('local/ucla_syllabus:managesyllabus', $coursecontext);
+                has_capability('local/syllabus:managesyllabus', $coursecontext);
     }
 }
 

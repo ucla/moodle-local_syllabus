@@ -24,7 +24,7 @@
  * it cannot do itself, it will tell you what you need to do.  The commands in
  * here will all be database-neutral, using the functions defined in DLL libraries.
  *
- * @package    local_ucla_syllabus
+ * @package    local_syllabus
  * @subpackage db
  * @copyright  2012 UC Regents
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -38,7 +38,7 @@ defined('MOODLE_INTERNAL') || die();
  * @param int $oldversion
  * @return bool
  */
-function xmldb_local_ucla_syllabus_upgrade($oldversion) {
+function xmldb_local_syllabus_upgrade($oldversion) {
     global $DB;
 
     $dbman = $DB->get_manager(); // Loads ddl manager and xmldb classes.
@@ -53,7 +53,7 @@ function xmldb_local_ucla_syllabus_upgrade($oldversion) {
     if ($oldversion < 2012120700) {
 
         // Define field url to be added to syllabus table.
-        $table = new xmldb_table('ucla_syllabus');
+        $table = new xmldb_table('syllabus');
         $field = new xmldb_field('url', XMLDB_TYPE_CHAR, '255', null, null, null, null, 'is_preview');
 
         // Conditionally launch add field url.
@@ -76,7 +76,7 @@ function xmldb_local_ucla_syllabus_upgrade($oldversion) {
         }
 
         // Savepoint for syllabus reached.
-        upgrade_plugin_savepoint(true, 2012120700, 'local', 'ucla_syllabus');
+        upgrade_plugin_savepoint(true, 2012120700, 'local', 'syllabus');
     }
 
     // Final return of upgrade result (true, all went good) to Moodle.

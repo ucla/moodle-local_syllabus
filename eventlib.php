@@ -17,12 +17,12 @@
 /**
  * Event handlers for syllabus events.
  *
- * @package    local_ucla_syllabus
+ * @package    local_syllabus
  * @copyright  2013 UC Regents
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-require_once($CFG->dirroot . '/local/ucla_syllabus/locallib.php');
+require_once($CFG->dirroot . '/local/syllabus/locallib.php');
 
 /**
  * Delete a course's syllabus when a course is deleted.
@@ -37,7 +37,7 @@ function delete_syllabi($course) {
     global $DB;
 
     // Get all syllabus entries for course.
-    $syllabi = $DB->get_records('ucla_syllabus',
+    $syllabi = $DB->get_records('syllabus',
             array('courseid' => $course->id));
 
     if (empty($syllabi)) {
@@ -48,7 +48,7 @@ function delete_syllabi($course) {
     foreach ($syllabi as $syllabus) {
         // Delete any files associated with syllabus entry.
         $files = $fs->get_area_files($course->context->id,
-                'local_ucla_syllabus', 'syllabus', $syllabus->id, '', false);
+                'local_syllabus', 'syllabus', $syllabus->id, '', false);
         if (!empty($files)) {
             foreach ($files as $file) {
                 $file->delete();
@@ -56,7 +56,7 @@ function delete_syllabi($course) {
         }
 
         // Next, delete entry in syllabus table.
-        $DB->delete_records('ucla_syllabus', array('id' => $syllabus->id));
+        $DB->delete_records('syllabus', array('id' => $syllabus->id));
 
         // This is the data needed to handle events.
         $data = new stdClass();
@@ -64,6 +64,6 @@ function delete_syllabi($course) {
         $data->access_type = $syllabus->access_type;
 
         // Trigger any necessary events.
-        events_trigger('ucla_syllabus_deleted', $data);
+        events_trigger('syllabus_deleted', $data);
     }
 }

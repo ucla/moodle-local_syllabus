@@ -19,7 +19,7 @@
  * 
  * This file contains the event handlers for the Moodle event API.
  * 
- * @package local_ucla_syllabus
+ * @package local_syllabus
  * @subpackage db
  * @copyright 2012 UC Regents
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -27,7 +27,7 @@
 
 $handlers = array (
     'course_deleted' => array(
-        'handlerfile'      => '/local/ucla_syllabus/eventlib.php',
+        'handlerfile'      => '/local/syllabus/eventlib.php',
         'handlerfunction'  => 'delete_syllabi',
         'schedule'         => 'instant',
         'internal'         => 1,

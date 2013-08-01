@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="local/ucla_syllabus/db" VERSION="20120926" COMMENT="XMLDB file for Moodle local/ucla_syllabus"
+<XMLDB PATH="local/syllabus/db" VERSION="20120926" COMMENT="XMLDB file for Moodle local/syllabus"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
 >
   <TABLES>
-    <TABLE NAME="ucla_syllabus" COMMENT="Table containing settings for uploaded syllabi." NEXT="ucla_syllabus_webservice">
+    <TABLE NAME="syllabus" COMMENT="Table containing settings for uploaded syllabi." NEXT="syllabus_webservice">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true" NEXT="courseid"/>
         <FIELD NAME="courseid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" PREVIOUS="id" NEXT="display_name"/>

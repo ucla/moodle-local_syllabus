@@ -21,7 +21,7 @@
  * This code fragment is called by moodle_needs_upgrading() and
  * /admin/index.php
  *
- * @package    local_ucla_syllabus
+ * @package    local_syllabus
  * @copyright  2012 UC Regents
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -30,4 +30,4 @@ defined('MOODLE_INTERNAL') || die();
 
 $plugin->version   = 2013060400;        // The current block version (Date: YYYYMMDDXX).
 $plugin->cron      = 0;                 // Period for cron to check this module (secs).
-$plugin->component = 'local_ucla_syllabus'; // To check on upgrade, that module sits in correct place.
+$plugin->component = 'local_syllabus';  // To check on upgrade, that module sits in correct place.

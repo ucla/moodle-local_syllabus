@@ -39,7 +39,7 @@
  *
  * The variable name for the capability definitions array is $capabilities.
  *
- * @package    local_ucla_syllabus
+ * @package    local_syllabus
  * @subpackage db
  * @copyright  2012 UC Regents
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -48,7 +48,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 $capabilities = array(
-    'local/ucla_syllabus:managesyllabus' => array(
+    'local/syllabus:managesyllabus' => array(
         'captype' => 'write',
         'contextlevel' => CONTEXT_COURSE,
         'legacy' => array(
